@@ -65,7 +65,7 @@ nnoremap <leader>b :Buffers<CR>
 nnoremap <leader>] :next<CR>
 nnoremap <leader>[ :prev<CR>
 
-" Set closetag filenames
+" Set closetag filenamghes
 let g:closetag_filenames = '*.html,*.xhtml,*.phtml,*.ep'
 let g:closetag_xhtml_filenames = '*.xhtml,*.jsx,*.ep'
 
@@ -107,8 +107,8 @@ runtime! macros/matchit.vim
 set listchars=tab:▶\ ,eol:¬,extends:…,precedes:…
 set nolist
 map <leader>l :set list!<CR> " Toggle
-highlight NonText ctermfg=11
-highlight SpecialKey ctermfg=11
+highlight NonText ctermfg=8
+highlight SpecialKey ctermfg=8
 
 " allow backspacing over everything in insert mode
 set backspace=indent,eol,start
