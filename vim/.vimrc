@@ -31,8 +31,8 @@ Plugin 'vim-perl/vim-perl', { 'for': 'perl', 'do': 'make clean carp dancer highl
 Plugin 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plugin 'junegunn/fzf.vim'
 Plugin 'altercation/vim-colors-solarized'
-" Plugin 'vim-scripts/mojo.vim'
-Plugin 'jiangmiao/auto-pairs'
+Plugin 'vim-scripts/mojo.vim'
+" Plugin 'jiangmiao/auto-pairs'
 
 call vundle#end()
 filetype plugin indent on
@@ -46,16 +46,22 @@ highlight CursorLineNR ctermbg=234 ctermfg=yellow
 highlight CursorLine ctermbg=234
 highlight CursorColumn ctermbg=232
 
-" Set leader
+" Set leader to space
 let mapleader=" "
 
-" Plugin options
-" Only start emmet in html or css
-let g:user_emmet_install_global = 0
-autocmd FileType html,css EmmetInstall
 
-" Rebind emmet
+" Plugin options
+
+" Only start emmet in html or css
 let g:user_emmet_leader_key='<C-X>'
+let g:user_emmet_install_global = 0
+if exists(":EmmetInstall")
+	autocmd FileType html,css EmmetInstall
+endif
+
+" Mojo highlighting
+let g:mojo_highlight_data = 1
+
 
 " Bind FZF
 nnoremap <leader><leader> :Files<CR>
@@ -85,10 +91,11 @@ set laststatus=2
 set nobackup
 set nowritebackup
 
-" Set .nmis files to perl filetype
+" Filetype detection
 augroup twig_ft
 	au!
 	autocmd BufNewFile,BufRead *.nmis set syntax=perl
+	autocmd BufNewFile,BufRead *.html.ep setfiletype html.ep 
 augroup END
 
 " Don't litter swp files everywhere
