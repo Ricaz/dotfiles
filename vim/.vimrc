@@ -5,37 +5,41 @@ set nocompatible
 filetype off
 
 " Install Vundle if not present
-let iCanHazVundle=1
+let installedVundle = 0
 let vundle_readme=expand('~/.vim/bundle/Vundle.vim/README.md')
 if !filereadable(vundle_readme)
 	echo "Installing Vundle.."
 	echo ""
 	silent !mkdir -p ~/.vim/bundle
 	silent !git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
-	let iCanHazVundle=0
-endif
-set rtp+=~/.vim/bundle/Vundle.vim/
-call vundle#rc()
-
-" let Vundle manage Vundle, required
-Plugin 'VundleVim/Vundle.vim'
-if iCanHazVundle == 0
-  echo "Installing Bundles, please ignore key map error messages"
-  echo ""
-  :PluginInstall
+	let installedVundle = 1
 endif
 
-" Plugin 'scrooloose/nerdtree.git'
-Plugin 'bling/vim-airline'
-Plugin 'vim-perl/vim-perl', { 'for': 'perl', 'do': 'make clean carp dancer highlight-all-pragmas moose test-more try-tiny' }
-Plugin 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
-Plugin 'junegunn/fzf.vim'
-Plugin 'altercation/vim-colors-solarized'
-Plugin 'vim-scripts/mojo.vim'
-" Plugin 'jiangmiao/auto-pairs'
+" Only run plugin stuff if Vundle is installed
+if filereadable(vundle_readme)
+	set rtp+=~/.vim/bundle/Vundle.vim/
+	call vundle#rc()
 
-call vundle#end()
-filetype plugin indent on
+	" If we just installed Vundle, run plugin installation
+	Plugin 'VundleVim/Vundle.vim'
+	Plugin 'bling/vim-airline'
+	Plugin 'vim-perl/vim-perl', { 'for': 'perl', 'do': 'make clean carp dancer highlight-all-pragmas moose test-more try-tiny' }
+	Plugin 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+	Plugin 'junegunn/fzf.vim'
+	Plugin 'altercation/vim-colors-solarized'
+	Plugin 'vim-scripts/mojo.vim'
+	" Plugin 'scrooloose/nerdtree.git'
+	" Plugin 'jiangmiao/auto-pairs'
+	if installedVundle == 1
+	  echo "Installing Bundles, please ignore key map error messages"
+	  echo ""
+	  :PluginInstall
+	  quit
+	endif
+
+	call vundle#end()
+	filetype plugin indent on
+endif
 
 " Linenumber colors
 set cursorline
