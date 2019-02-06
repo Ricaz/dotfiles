@@ -28,6 +28,7 @@ if filereadable(vundle_readme)
 	Plugin 'junegunn/fzf.vim'
 	Plugin 'altercation/vim-colors-solarized'
 	Plugin 'vim-scripts/mojo.vim'
+	Plugin 'chase/vim-ansible-yaml'
 	" Plugin 'scrooloose/nerdtree.git'
 	" Plugin 'jiangmiao/auto-pairs'
 	if installedVundle == 1
@@ -55,6 +56,13 @@ let mapleader=" "
 
 
 " Plugin options
+""""""""""""""""
+
+let g:airline_powerline_fonts = 1
+if !exists('g:airline_symbols')
+	let g:airline_symbols={}
+endif
+
 
 " Only start emmet in html or css
 let g:user_emmet_leader_key='<C-X>'
