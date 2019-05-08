@@ -78,6 +78,7 @@ let g:mojo_highlight_data = 1
 " Bind FZF
 nnoremap <leader><leader> :Files<CR>
 nnoremap <leader>b :Buffers<CR>
+let $FZF_DEFAULT_COMMAND = 'ag -g ""'
 
 " Next/previous buffer (for editing multiple files)
 nnoremap <leader>] :next<CR>
