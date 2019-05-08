@@ -427,15 +427,6 @@ diff() {
 	fi
 }
 
-mount() {
-	[[ -z $@ ]] && =mount | column -t || sudo =mount $@
-}
-
-# Source any custom zsh file in homedir
-if [ -f "${HOME}/.zshrc.custom" ]; then
-	source "${HOME}/.zshrc.custom"
-fi
-
 # Ensure the shell prompt is set correctly
 refresh_shell
 
