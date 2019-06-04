@@ -58,10 +58,10 @@ let mapleader=" "
 " Plugin options
 """"""""""""""""
 
-let g:airline_powerline_fonts = 1
-if !exists('g:airline_symbols')
-	let g:airline_symbols={}
-endif
+"let g:airline_powerline_fonts = 1
+"if !exists('g:airline_symbols')
+"	let g:airline_symbols={}
+"endif
 
 
 " Only start emmet in html or css
@@ -78,6 +78,7 @@ let g:mojo_highlight_data = 1
 " Bind FZF
 nnoremap <leader><leader> :Files<CR>
 nnoremap <leader>b :Buffers<CR>
+let $FZF_DEFAULT_COMMAND = 'ag -g ""'
 
 " Next/previous buffer (for editing multiple files)
 nnoremap <leader>] :next<CR>
