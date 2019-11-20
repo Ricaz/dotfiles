@@ -6,6 +6,14 @@
 #
 # Global Order: zshenv, zprofile, zshrc, zlogin
 
+# WSL stuff
+export DOCKER_HOST="tcp://localhost:2375"
+zmodload zsh/zprof
+
+# Enable FZF
+source /usr/share/fzf/key-bindings.zsh
+source /usr/share/fzf/completion.zsh
+
 # PATH
 export PATH="/sbin:$PATH"
 export PATH="/usr/sbin:$PATH"
@@ -19,13 +27,9 @@ export PATH="$HOME/bin:$PATH"
 ### GLOBAL ZSH CONFIGURATION
 ###
 
-autoload run-help
-
-autoload -U compinit && compinit
-autoload -U zmv
-autoload -U colors && colors
-autoload -U promptinit && promptinit
-autoload -U url-quote-magic && zle -N self-insert url-quote-magic
+autoload -Uz compinit && compinit
+autoload -Uz colors && colors
+autoload -Uz promptinit && promptinit
 
 tabs 4
 
@@ -36,7 +40,7 @@ tabs 4
 # zstyle ':vcs_info:*' actionformats '%F{5}[%F{2}%b%F{3}|%F{1}%a%F{5}]%f '
 # zstyle ':vcs_info:*' formats       '%F{5}[%F{2}%b%F{5}]%f '
 # zstyle ':vcs_info:(sv[nk]|bzr):*' branchformat '%b%F{1}:%F{3}%r'
-# zstyle ':vcs_info:*' enable git cvs svn
+# zstyle ':vcs_info:*' enable git
 # vcs_info_wrapper() {
 # 	vcs_info
 # 	if [ -n "$vcs_info_msg_0_" ]; then
@@ -45,33 +49,26 @@ tabs 4
 # }
 # RPROMPT=$'$(vcs_info_wrapper)'
 
-# Automatically quote URLs
-autoload -Uz bracketed-paste-magic
-zle -N bracketed-paste bracketed-paste-magic
-zle -N self-insert url-quote-magic
-
 # Use ls color output
 export LS_COLORS="rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=01;34:ow=01;34:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.jpg=01;35:*.jpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:"
 
-# Fix sshfs completions
-compdef sshfs=scp
 
-zstyle ':completion:*:*:cd:*:directory-stack' menu select
-zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
-zstyle ':completion:*' menu select=2
-zstyle ":completion:*:commands" rehash 1
-zstyle ':completion::(^approximate*):*:functions' ignored-patterns '_*'
-zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
-
-zstyle ':completion:*:sudo:*' command-path /usr/local/sbin /usr/local/bin /usr/sbin /usr/bin /sbin /bin /usr/X11R6/bin
-
-zstyle ':completion:*:descriptions' format '%U%B%d%b%u'
-zstyle ':completion:*:warnings' format '%BSorry, no matches for: %d%b'
+#zstyle ':completion:*:*:cd:*:directory-stack' menu select
+#zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
+#zstyle ':completion:*' menu select=2
+#zstyle ":completion:*:commands" rehash 1
+#zstyle ':completion::(^approximate*):*:functions' ignored-patterns '_*'
+#zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
+#
+#zstyle ':completion:*:sudo:*' command-path /usr/local/sbin /usr/local/bin /usr/sbin /usr/bin /sbin /bin /usr/X11R6/bin
+#
+#zstyle ':completion:*:descriptions' format '%U%B%d%b%u'
+#zstyle ':completion:*:warnings' format '%BSorry, no matches for: %d%b'
 
 # Allow approximate
-zstyle ':completion:*' completer _complete _match _approximate
-zstyle ':completion:*:match:*' original only
-zstyle ':completion:*:approximate:*' max-errors 1 numeric
+#zstyle ':completion:*' completer _complete _match _approximate
+#zstyle ':completion:*:match:*' original only
+#zstyle ':completion:*:approximate:*' max-errors 1 numeric
 
 # History configuration
 HISTSIZE=100000
@@ -81,6 +78,8 @@ setopt extended_history
 setopt hist_find_no_dups
 setopt hist_ignore_space
 setopt hist_ignore_all_dups
+setopt inc_append_history
+setopt share_history
 
 # Auto stack directories
 DIRSTACKSIZE=10
@@ -118,7 +117,6 @@ echo -ne '\e]4;4;#0066FF\a'
 ###
 ### KEY BINDINGS
 ###
-
 
 # Ensure emacs mode
 bindkey -e
@@ -162,21 +160,6 @@ bindkey '^[[3;5~' kill-word
 bindkey '^[[A' up-line-or-search
 bindkey '^[[B' down-line-or-search
 
-# Bind ctrl+x, ctrl+e to open current line in $EDITOR.
-autoload -U edit-command-line
-zle -N edit-command-line
-bindkey '^x^e' edit-command-line
-
-# Bind alt+s to prepend sudo on current line 
-prepend_sudo() {
-	if [[ "$BUFFER" != su(do|)\ * ]]; then
-		BUFFER="sudo $BUFFER"
-		(( CURSOR += 5 ))
-	fi
-}
-zle -N prepend_sudo
-bindkey '^[s' prepend_sudo
-
 READNULLCMD=${PAGER:-/usr/bin/pager}
 
 ###
@@ -193,7 +176,6 @@ export LESS_TERMCAP_ue=$'\E[0m'
 export LESS_TERMCAP_us=$'\E[01;32m'
 
 # Misc
-export PDFREADER="okular"
 export LANG=en_US.UTF-8
 export LC_LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
@@ -201,7 +183,6 @@ export LC_TIME=da_DK
 export OOO_FORCE_DESKTOP="kde"
 export EDITOR="vim"
 export PAGER="less"
-export _JAVA_OPTIONS="-Dawt.useSystemAAFontSettings=on -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel"
 
 # Default options passed to less (search incase sensitive, don't count line numbers)
 export LESS='-InSR'
@@ -250,6 +231,7 @@ alias insecuressh='ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=
 alias insecurescp='scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
 alias gits='git status'
 alias gitc='git commit'
+alias os='openstack --insecure'
 
 # Alias suffixes (kinda 'open with' functionality)
 alias -s log="less"
@@ -429,6 +411,17 @@ diff() {
 
 # Ensure the shell prompt is set correctly
 refresh_shell
+
+makecsr() {
+	KEYNAME=$1
+	[ -s "$KEYNAME" ] || {
+		echo "File '$KEYNAME' does not exist or is empty"
+		return
+	}
+	DNS=$(echo $KEYNAME | sed s/'\.\w*$'//)
+	openssl req -new -key $KEYNAME -subj "/C=DK/ST=Nordjylland/O=Telenor/CN=$DNS" -addext "subjectAltName = DNS:$DNS" -out $DNS.csr
+	echo "Made CSR and wrote to '$DNS.csr'"
+}
 
 # Paste to ix.io
 ix() {
