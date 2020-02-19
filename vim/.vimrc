@@ -30,7 +30,6 @@ if empty(glob(configpath . '/autoload/plug.vim'))
 endif
 
 call plug#begin(configpath . '/plugged')
-Plug 'VundleVim/Vundle.vim'
 Plug 'itchyny/lightline.vim'
 Plug 'vim-perl/vim-perl', { 'for': 'perl', 'do': 'make clean carp dancer highlight-all-pragmas moose test-more try-tiny' }
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
