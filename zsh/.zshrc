@@ -11,8 +11,9 @@ export DOCKER_HOST="tcp://localhost:2375"
 zmodload zsh/zprof
 
 # Enable FZF
-source /usr/share/fzf/key-bindings.zsh
-source /usr/share/fzf/completion.zsh
+[ -f /usr/share/fzf/key-bindings.zsh ] && source /usr/share/fzf/key-bindings.zsh
+[ -f /usr/share/fzf/completion.zsh ] && source /usr/share/fzf/completion.zsh
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 # PATH
 export PATH="/sbin:$PATH"
@@ -186,9 +187,6 @@ export PAGER="less"
 
 # Default options passed to less (search incase sensitive, don't count line numbers)
 export LESS='-InSR'
-
-# Set hostname variable if not already available
-[[ -z $HOSTNAME ]] && export HOSTNAME=$(hostname)
 
 export TERM='xterm-256color'
 # Set TERM variable
