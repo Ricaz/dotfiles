@@ -103,6 +103,7 @@ set autoindent
 set laststatus=2
 set nobackup
 set nowritebackup
+set scrolloff=8
 
 " Filetype detection
 augroup twig_ft
