@@ -7,7 +7,6 @@
 # Global Order: zshenv, zprofile, zshrc, zlogin
 
 # WSL stuff
-export DOCKER_HOST="tcp://localhost:2375"
 zmodload zsh/zprof
 
 # Enable FZF
