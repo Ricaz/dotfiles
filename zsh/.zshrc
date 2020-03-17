@@ -230,6 +230,7 @@ alias insecurescp='scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=
 alias gits='git status'
 alias gitc='git commit'
 alias os='openstack --insecure'
+alias telenorvpn='sudo openconnect --servercert pin-sha256:/tB/6+LZjSZoGERkRCTCJeowG4sODjlkFuKsuMHGHIE= -u maals 212.242.37.232'
 
 # Alias suffixes (kinda 'open with' functionality)
 alias -s log="less"
