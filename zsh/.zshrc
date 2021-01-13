@@ -166,6 +166,8 @@ READNULLCMD=${PAGER:-/usr/bin/pager}
 ### GLOBAL EXPORTS
 ###
 
+export BROWSER=chromium
+
 # Colors in less command
 export LESS_TERMCAP_mb=$'\E[01;31m'
 export LESS_TERMCAP_md=$'\E[01;31m'
@@ -218,8 +220,9 @@ alias ...='cd ../../'
 alias makepkg='nice -n 19 makepkg'
 alias nano='nano -xwc'
 alias screen='screen -U'
-alias poweroff='sudo poweroff'
-alias reboot='sudo reboot'
+alias poweroff='systemctl shutdown'
+alias shutdown='systemctl shutdown'
+alias reboot='systemctl reboot'
 alias umount='sudo umount'
 alias open='nohup xdg-open'
 alias highlight="/usr/bin/vendor_perl/ack -i --color-match='bold red' --passthru"
