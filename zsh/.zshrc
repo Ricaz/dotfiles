@@ -5,6 +5,7 @@
 # options, key bindings, etc.
 #
 # Global Order: zshenv, zprofile, zshrc, zlogin
+export SHELL="$(which zsh)"
 
 # WSL stuff
 zmodload zsh/zprof
@@ -208,6 +209,7 @@ alias ls='ls --quoting-style=literal -h --color'
 alias ll='ls -lh'
 alias la='ls -lAh'
 alias f='ll | grep -i'
+alias tmux='tmux -2'
 alias grep='grep -E --color=auto'
 alias -g gr='| grep -i'
 alias -g pastebin="curl -F 'f:1=<-' ix.io"
