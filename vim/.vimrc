@@ -206,6 +206,8 @@ set background=dark
 
 " Fix YAML indentation
 autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
+autocmd FileType javascript setlocal ts=2 sts=2 sw=2 expandtab
+autocmd FileType vue setlocal ts=2 sts=2 sw=2 expandtab
 
 " Vimdiff quickfix
 highlight DiffAdd  cterm=bold ctermfg=10 ctermbg=17 gui=none guifg=bg guibg=Red
