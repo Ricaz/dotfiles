@@ -21,6 +21,7 @@ export PATH="/usr/sbin:$PATH"
 export PATH="/usr/bin:$PATH"
 export PATH="/usr/bin/vendor_perl:$PATH"
 export PATH="$HOME/bin:$PATH"
+export PATH="$HOME/.config/composer/vendor/bin:$PATH"
 
 #export PERL5LIB="/usr/local/telenor/vmware/vsphere-automation-sdk-perl/lib/sdk:/usr/local/telenor/vmware/vsphere-automation-sdk-perl/lib/runtime:/usr/local/telenor/vmware/vsphere-automation-sdk-perl/samples:$PERL5LIB"
 
@@ -112,9 +113,6 @@ precmd() {
 	printf "\033k%s %s@%s\033\\" "${prompt_char}" "${prompt_user}" "${prompt_host}"
 }
 
-# Change blue color to cyan (standard blue color is too dark)
-echo -ne '\e]4;4;#0066FF\a'
-
 ###
 ### KEY BINDINGS
 ###
@@ -166,6 +164,8 @@ READNULLCMD=${PAGER:-/usr/bin/pager}
 ###
 ### GLOBAL EXPORTS
 ###
+
+export BROWSER="firefox"
 
 # Colors in less command
 export LESS_TERMCAP_mb=$'\E[01;31m'
@@ -220,8 +220,9 @@ alias ...='cd ../../'
 alias makepkg='nice -n 19 makepkg'
 alias nano='nano -xwc'
 alias screen='screen -U'
-alias poweroff='sudo poweroff'
-alias reboot='sudo reboot'
+alias poweroff='systemctl poweroff'
+alias shutdown='systemctl poweroff'
+alias reboot='systemctl reboot'
 alias umount='sudo umount'
 alias open='nohup xdg-open'
 alias highlight="/usr/bin/vendor_perl/ack -i --color-match='bold red' --passthru"
@@ -246,14 +247,6 @@ refresh_shell() {
 		export PS1="$(print '%{\e[1;31m%}%M%{\e[1;34m%} %c %{\e[1;34m%}%% %{\e[0m%}')" # Root color is red
 	else
 		export PS1="$(print '%{\e[1;32m%}%n@%M%{\e[1;33m%} %c %{\e[1;33m%}%% %{\e[0m%}')"
-	fi
-}
-
-pacman() {
-	if [[ "${EUID}" == "0" || ! -f "/usr/bin/pacaur" ]]; then
-		=pacman $*
-	else
-		pacaur $*
 	fi
 }
 
@@ -340,48 +333,6 @@ reload() {
 	return 0;
 }
 
-# Update shared configuration and reload zsh config
-update_conf() {
-	git -C /etc/conf_repo/ pull
-	reload
-}
-
-# Rename scene releases to original names: "Some Downloaded Release" => "Some.Downloaded-Release"
-scenerls() {
-	RLS=$1
-	[ -z ${RLS} ] && echo "Invalid argument" && return;
-	[ ! -d ${RLS} ] && [ ! -f ${RLS} ] && echo "File or directory does not exist: ${RLS}" && return;
-	RLS_SPLIT=(${(s: :)RLS})
-	COUNT_RLS_SPLIT=${#RLS_SPLIT[*]}
-	RLS_DEST=""
-	I=1
-	for RLS_E in ${RLS_SPLIT}; do
-		if (( ${I} == ${COUNT_RLS_SPLIT} && ${I} > 2 )); then
-			RLS_DEST=$(echo ${RLS_DEST}"-"${RLS_SPLIT[$I]});
-		elif (( ${I} > 1 )); then
-			RLS_DEST=$(echo ${RLS_DEST}"."${RLS_SPLIT[$I]});
-		else
-			RLS_DEST=${RLS_SPLIT[$I]};
-		fi
-		let I++;
-	done
-	mv "${RLS}" "${RLS_DEST}"
-	echo "Successfully moved '${RLS}' to '${RLS_DEST}'"
-}
-
-# Pacman search function which also searches AUR
-pacs() {
-	pacaur -Ssa --color=always $1
-	pacaur -Ssr --color=always $1
-}
-
-nohup() {
-	[ "$1" = "open" ] && 1="xdg-open";
-	/usr/bin/nohup $* &>/dev/null &
-	sudo renice -0 $! &> /dev/null
-	rm -f nohup.out
-}
-
 whois() {
 	/usr/bin/whois -H $1 | iconv -f iso-8859-1 -t utf-8
 }
@@ -421,30 +372,4 @@ makecsr() {
 	DNS=$(echo $KEYNAME | sed s/'\.\w*$'//)
 	openssl req -new -key $KEYNAME -subj "/C=DK/ST=Nordjylland/O=Telenor/CN=$DNS" -addext "subjectAltName = DNS:$DNS" -out $DNS.csr
 	echo "Made CSR and wrote to '$DNS.csr'"
-}
-
-# Paste to ix.io
-ix() {
-    local opts
-    local OPTIND
-    [ -f "$HOME/.netrc" ] && opts='-n'
-    while getopts ":hd:i:n:" x; do
-        case $x in
-            h) echo "ix [-d ID] [-i ID] [-n N] [opts]"; return;;
-            d) $echo curl $opts -X DELETE ix.io/$OPTARG; return;;
-            i) opts="$opts -X PUT"; local id="$OPTARG";;
-            n) opts="$opts -F read:1=$OPTARG";;
-        esac
-    done
-    shift $(($OPTIND - 1))
-    [ -t 0 ] && {
-        local filename="$1"
-        shift
-        [ "$filename" ] && {
-            curl $opts -F f:1=@"$filename" $* ix.io/$id
-            return
-        }
-        echo "^C to cancel, ^D to send."
-    }
-    curl $opts -F f:1='<-' $* ix.io/$id
 }
