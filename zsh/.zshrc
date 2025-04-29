@@ -22,6 +22,8 @@ export PATH="/usr/bin:$PATH"
 export PATH="/usr/bin/vendor_perl:$PATH"
 export PATH="$HOME/bin:$PATH"
 export PATH="$HOME/.config/composer/vendor/bin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
+export PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"
 
 #export PERL5LIB="/usr/local/telenor/vmware/vsphere-automation-sdk-perl/lib/sdk:/usr/local/telenor/vmware/vsphere-automation-sdk-perl/lib/runtime:/usr/local/telenor/vmware/vsphere-automation-sdk-perl/samples:$PERL5LIB"
 
