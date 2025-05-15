@@ -9,11 +9,19 @@ export SHELL="$(which zsh)"
 
 # WSL stuff
 zmodload zsh/zprof
+if grep -q "microsoft" /proc/version &>/dev/null; then
+	# Requires VcXsrv
+	#export DISPLAY="$(/sbin/ip route | awk '/default/ { print $3 }'):0"
+fi
+export PATH="/mnt/c/Windows:/mnt/c/Windows/System32:$PATH"
 
 # Enable FZF
 [ -f /usr/share/fzf/key-bindings.zsh ] && source /usr/share/fzf/key-bindings.zsh
 [ -f /usr/share/fzf/completion.zsh ] && source /usr/share/fzf/completion.zsh
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# Install NodeJS modules for user
+export npm_config_prefix="$HOME/.local"
 
 # PATH
 export PATH="/sbin:$PATH"
@@ -21,9 +29,8 @@ export PATH="/usr/sbin:$PATH"
 export PATH="/usr/bin:$PATH"
 export PATH="/usr/bin/vendor_perl:$PATH"
 export PATH="$HOME/bin:$PATH"
-export PATH="$HOME/.config/composer/vendor/bin:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
-export PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"
+
 
 #export PERL5LIB="/usr/local/telenor/vmware/vsphere-automation-sdk-perl/lib/sdk:/usr/local/telenor/vmware/vsphere-automation-sdk-perl/lib/runtime:/usr/local/telenor/vmware/vsphere-automation-sdk-perl/samples:$PERL5LIB"
 
@@ -38,20 +45,20 @@ autoload -Uz promptinit && promptinit
 tabs 4
 
 # VCS prompt
-# autoload -Uz vcs_info
-# precmd() { vcs_info }
-# setopt prompt_subst
-# zstyle ':vcs_info:*' actionformats '%F{5}[%F{2}%b%F{3}|%F{1}%a%F{5}]%f '
-# zstyle ':vcs_info:*' formats       '%F{5}[%F{2}%b%F{5}]%f '
-# zstyle ':vcs_info:(sv[nk]|bzr):*' branchformat '%b%F{1}:%F{3}%r'
-# zstyle ':vcs_info:*' enable git
-# vcs_info_wrapper() {
-# 	vcs_info
-# 	if [ -n "$vcs_info_msg_0_" ]; then
-# 		echo "%{$fg[grey]%}${vcs_info_msg_0_}%{$reset_color%}$del"
-# 	fi	
-# }
-# RPROMPT=$'$(vcs_info_wrapper)'
+autoload -Uz vcs_info
+precmd() { vcs_info }
+setopt prompt_subst
+zstyle ':vcs_info:*' actionformats '%F{5}[%F{2}%b%F{3}|%F{1}%a%F{5}]%f '
+zstyle ':vcs_info:*' formats       '%F{5}[%F{2}%b%F{5}]%f '
+zstyle ':vcs_info:(sv[nk]|bzr):*' branchformat '%b%F{1}:%F{3}%r'
+zstyle ':vcs_info:*' enable git
+vcs_info_wrapper() {
+	vcs_info
+	if [ -n "$vcs_info_msg_0_" ]; then
+		echo "%{$fg[grey]%}${vcs_info_msg_0_}%{$reset_color%}$del"
+	fi	
+}
+RPROMPT=$'$(vcs_info_wrapper)'
 
 # Use ls color output
 export LS_COLORS="rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=01;34:ow=01;34:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.jpg=01;35:*.jpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:"
@@ -115,6 +122,9 @@ precmd() {
 	printf "\033k%s %s@%s\033\\" "${prompt_char}" "${prompt_user}" "${prompt_host}"
 }
 
+# Change blue color to cyan (standard blue color is too dark)
+echo -ne '\e]4;4;#0066FF\a'
+
 ###
 ### KEY BINDINGS
 ###
@@ -167,8 +177,6 @@ READNULLCMD=${PAGER:-/usr/bin/pager}
 ### GLOBAL EXPORTS
 ###
 
-export BROWSER="firefox"
-
 # Colors in less command
 export LESS_TERMCAP_mb=$'\E[01;31m'
 export LESS_TERMCAP_md=$'\E[01;31m'
@@ -209,7 +217,7 @@ alias ls='ls --quoting-style=literal -h --color'
 alias ll='ls -lh'
 alias la='ls -lAh'
 alias f='ll | grep -i'
-alias tmux='tmux -2'
+alias tmux='ssh-agent tmux -2'
 alias grep='grep -E --color=auto'
 alias -g gr='| grep -i'
 alias -g pastebin="curl -F 'f:1=<-' ix.io"
@@ -222,9 +230,8 @@ alias ...='cd ../../'
 alias makepkg='nice -n 19 makepkg'
 alias nano='nano -xwc'
 alias screen='screen -U'
-alias poweroff='systemctl poweroff'
-alias shutdown='systemctl poweroff'
-alias reboot='systemctl reboot'
+alias poweroff='sudo poweroff'
+alias reboot='sudo reboot'
 alias umount='sudo umount'
 alias open='nohup xdg-open'
 alias highlight="/usr/bin/vendor_perl/ack -i --color-match='bold red' --passthru"
@@ -232,9 +239,11 @@ alias jobs='jobs -l'
 alias insecuressh='ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
 alias insecurescp='scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
 alias gits='git status'
+alias gita='git add'
 alias gitc='git commit'
 alias os='openstack --insecure'
 alias telenorvpn='sudo openconnect --servercert pin-sha256:/tB/6+LZjSZoGERkRCTCJeowG4sODjlkFuKsuMHGHIE= -u maals 212.242.37.232'
+alias x509='openssl x509 -noout -text -in'
 
 # Alias suffixes (kinda 'open with' functionality)
 alias -s log="less"
@@ -249,6 +258,14 @@ refresh_shell() {
 		export PS1="$(print '%{\e[1;31m%}%M%{\e[1;34m%} %c %{\e[1;34m%}%% %{\e[0m%}')" # Root color is red
 	else
 		export PS1="$(print '%{\e[1;32m%}%n@%M%{\e[1;33m%} %c %{\e[1;33m%}%% %{\e[0m%}')"
+	fi
+}
+
+pacman() {
+	if [[ "${EUID}" == "0" || ! -f "/usr/bin/pacaur" ]]; then
+		=pacman $*
+	else
+		pacaur $*
 	fi
 }
 
@@ -335,6 +352,25 @@ reload() {
 	return 0;
 }
 
+# Update shared configuration and reload zsh config
+update_conf() {
+	git -C /etc/conf_repo/ pull
+	reload
+}
+
+# Pacman search function which also searches AUR
+pacs() {
+	pacaur -Ssa --color=always $1
+	pacaur -Ssr --color=always $1
+}
+
+nohup() {
+	[ "$1" = "open" ] && 1="xdg-open";
+	/usr/bin/nohup $* &>/dev/null &
+	sudo renice -0 $! &> /dev/null
+	rm -f nohup.out
+}
+
 whois() {
 	/usr/bin/whois -H $1 | iconv -f iso-8859-1 -t utf-8
 }
@@ -362,9 +398,6 @@ diff() {
 	fi
 }
 
-# Ensure the shell prompt is set correctly
-refresh_shell
-
 makecsr() {
 	KEYNAME=$1
 	[ -s "$KEYNAME" ] || {
@@ -375,3 +408,32 @@ makecsr() {
 	openssl req -new -key $KEYNAME -subj "/C=DK/ST=Nordjylland/O=Telenor/CN=$DNS" -addext "subjectAltName = DNS:$DNS" -out $DNS.csr
 	echo "Made CSR and wrote to '$DNS.csr'"
 }
+
+prettify-json() {
+    local temp_file
+    temp_file=$(mktemp) &&
+      jq . < "$1" > "$temp_file" && mv -- "$temp_file" "$1"
+}
+
+minify-json() {
+    local temp_file
+    temp_file=$(mktemp) &&
+      jq -c . < "$1" > "$temp_file" && mv -- "$temp_file" "$1"
+}
+
+# Ensure the shell prompt is set correctly
+refresh_shell
+
+# Ensure ssh-agent is running
+if ! pgrep ssh-agent > /dev/null; then
+    ssh-agent -t 1h > "$XDG_RUNTIME_DIR/ssh-agent.env"
+fi
+#if [[ ! -f "$SSH_AUTH_SOCK" ]]; then
+#    source "$XDG_RUNTIME_DIR/ssh-agent.env" >/dev/null
+#fi
+
+source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+
+# Start tmux if not running
+[[ -z "$TMUX" && ! $(pgrep tmux) ]] && tmux
