@@ -1,1 +1,117 @@
-/mnt/c/Users/MAALS/.ideavimrc
+let mapleader=" "
+
+" Don't be vi-compatible
+set nocompatible
+
+" Linenumber colors
+set cursorline
+set nocursorcolumn
+highlight clear CursorLine
+highlight LineNR ctermfg=white ctermbg=233
+highlight CursorLineNR cterm=bold ctermbg=234 ctermfg=yellow
+highlight CursorLine ctermbg=234
+highlight CursorColumn ctermbg=232
+nnoremap <leader>] :next<CR>
+nnoremap <leader>[ :prev<CR>
+
+" Encoding
+set encoding = 'utf-8'
+set fileencoding = 'utf-8'
+set fileformat = 'unix'
+
+" Copy/paste buffers
+vnoremap <leader>y "+y
+nnoremap <leader>Y "+yg_
+nnoremap <leader>y "+y
+nnoremap <leader>p "+p
+nnoremap <leader>P "+P
+
+" General
+set number
+syntax on
+set tabstop=4
+set shiftwidth=4
+set softtabstop=5
+set noexpandtab
+set smarttab
+set autoindent
+set laststatus=2
+set nobackup
+set nowritebackup
+set scrolloff=8
+set relativenumber
+set mouse=
+set showmode
+
+
+" Don't litter swp files everywhere
+set directory^=$HOME/.vim/tmp//
+" Search
+set incsearch
+set ignorecase
+set smartcase
+set showmatch
+
+" allow backspacing over everything in insert mode
+set backspace=indent,eol,start
+
+set ruler   " show the cursor position all the time
+set showcmd   " display incomplete commands
+set incsearch   " do incremental searching
+
+" Don't use Ex mode, use Q for formatting
+map Q gq
+
+" CTRL-U in insert mode deletes a lot.  Use CTRL-G u to first break undo,
+" so that you can undo CTRL-U after inserting a line break.
+inoremap <C-U> <C-G>u<C-U>
+
+" Convenient command to see the difference between the current buffer and the
+" file it was loaded from, thus the changes you made.
+" Only define it when not defined already.
+if !exists(":DiffOrig")
+  command DiffOrig vert new | set bt=nofile | r ++edit # | 0d_ | diffthis
+      \ | wincmd p | diffthis
+endif
+
+" Jetbrains actions
+noremap <leader><leader> :action GotoFile<CR>
+noremap <leader>b :action Switcher<CR>
+noremap <leader>o :action copilot.chat.show<CR>
+noremap <leader>i :action copilot.chat.inline<CR>
+noremap <leader>t :action ActivateTerminalToolWindow<CR>
+
+set ideajoin
+set ideamarks
+set idearefactormode=normal
+set ideastatusicon=gray
+
+" Fix tabs
+nnoremap <leader>t :%retab!<CR>
+
+" Execute current file
+nnoremap <leader>r :!%:p<Enter>
+" Wait for arguments
+nnoremap <F9> :!%:p
+
+" Resizing panes
+nnoremap <silent> <Leader>+ :exe "resize " . (winheight(0) * 3/2)<CR>
+nnoremap <silent> <Leader>- :exe "resize " . (winheight(0) * 2/3)<CR>
+
+" Toggle relative numbers
+nnoremap <Leader>n :set relativenumber!<CR>
+asd
+" Write as sudo
+cmap w!! w !sudo tee > /dev/null %
+
+" Rebind keys for easily switching between split panes
+nnoremap <C-J> <C-W><C-J>
+nnoremap <C-K> <C-W><C-K>
+nnoremap <C-L> <C-W><C-L>
+nnoremap <C-H> <C-W><C-H>
+nnoremap <F1> :NERDTreeToggle<CR>
+set splitbelow
+set splitright
+
+" Tab indents in Visual Mode
+vmap <tab> >gv
