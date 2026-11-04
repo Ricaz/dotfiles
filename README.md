@@ -21,4 +21,18 @@ ln -sf ~/dotfiles/tmux/.tmux.conf ~/.tmux.conf
 ln -sf ~/dotfiles/vim/.vimrc ~/.vimrc
 ```
 
+## kitty, i3 and greenclip (desktop user)
+
+Clipboard history needs `rofi-greenclip` from the AUR (`trizen -S rofi-greenclip`).
+
+```sh
+mkdir -p ~/.config/kitty ~/.config/i3
+for f in kitty.conf current-theme.conf no-preference-theme.auto.conf; do
+	ln -sf ~/dotfiles/kitty/$f ~/.config/kitty/$f
+done
+ln -sf ~/dotfiles/i3/config ~/.config/i3/config
+```
+
+Ctrl+Insert copies, Shift+Insert pastes, and $mod+Insert opens the clipboard history.
+
 The first time vim starts, it installs its plugins.

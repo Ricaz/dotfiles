@@ -66,12 +66,18 @@ let $FZF_DEFAULT_COMMAND = 'ag -g ""'
 nnoremap <leader>] :next<CR>
 nnoremap <leader>[ :prev<CR>
 
-" Copy/paste buffers
+" Copy to the system clipboard. Vim is built without X clipboard support, so
+" copying goes through the terminal (OSC 52); this also works under sudo su and
+" over SSH. Paste with Shift+Insert.
+if !has('nvim') && has('clipboard_provider')
+  let g:osc52_force_avail = 1     " detection fails inside tmux
+  let g:osc52_disable_paste = 1   " OSC 52 paste prompts/hangs; use Shift+Insert
+  packadd osc52
+  set clipmethod+=osc52
+endif
 vnoremap <leader>y "+y
 nnoremap <leader>Y "+yg_
 nnoremap <leader>y "+y
-nnoremap <leader>p "+p
-nnoremap <leader>P "+P
 
 " Basic settings
 set number
