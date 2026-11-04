@@ -1,0 +1,396 @@
+# Shared zsh config. install.sh copies it to /etc/zsh/zshrc, so every
+# interactive zsh (rcz, maals, root, ...) loads it before the user's ~/.zshrc.
+# Private or user-specific settings (secrets, work aliases) go in ~/.zshrc.
+#
+# Light mode (root and SSH sessions) skips Powerlevel10k, autosuggestions and
+# tmux autostart. Override with ZSH_LIGHT=0 or ZSH_LIGHT=1 in the environment.
+#
+# tmux autostart is opt-in per user: put ZSH_TMUX_AUTOSTART=1 in ~/.zshenv.
+# (Not ~/.zshrc: that runs after p10k's instant prompt has taken over stdin,
+# and tmux then fails with "open terminal failed: not a terminal".)
+
+if [[ -z $ZSH_LIGHT ]]; then
+	if (( EUID == 0 )) || [[ -n $SSH_TTY ]]; then
+		ZSH_LIGHT=1
+	else
+		ZSH_LIGHT=0
+	fi
+fi
+
+_zsrc() { [[ -r $1 ]] && source "$1" }
+
+###
+### BEFORE INSTANT PROMPT
+### p10k's instant prompt points stdin at /dev/null until init finishes, so
+### anything that needs the terminal must run above it.
+###
+
+[[ -t 1 ]] && tabs 4
+
+# ssh-agent: use the systemd user socket when enabled
+# (systemctl --user enable --now ssh-agent.socket), otherwise tmux starts its own.
+if [[ -z $SSH_AUTH_SOCK && -S ${XDG_RUNTIME_DIR:-/run/user/$UID}/ssh-agent.socket ]]; then
+	export SSH_AUTH_SOCK=${XDG_RUNTIME_DIR:-/run/user/$UID}/ssh-agent.socket
+fi
+
+tmux() {
+	# Only a brand new tmux server gets wrapped in its own ssh-agent.
+	if [[ -z $SSH_AUTH_SOCK && -z $TMUX ]] && ! command tmux has-session 2>/dev/null; then
+		command ssh-agent tmux -2 "$@"
+	else
+		command tmux -2 "$@"
+	fi
+}
+
+# Start tmux on login if the user opted in and has no tmux running yet
+if [[ $ZSH_TMUX_AUTOSTART == 1 ]] && (( ! ZSH_LIGHT )) && [[ -z $TMUX && -t 0 ]] \
+		&& (( $+commands[tmux] )) \
+		&& ! command tmux has-session 2>/dev/null; then
+	cd && tmux
+fi
+
+if (( ! ZSH_LIGHT )); then
+	typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
+	_zsrc "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
+###
+### ENVIRONMENT
+###
+
+typeset -U path PATH
+path=(~/.local/bin ~/bin /usr/bin/vendor_perl $path)
+if [[ -r /proc/version && $(</proc/version) == *[Mm]icrosoft* ]]; then
+	path+=(/mnt/c/Windows /mnt/c/Windows/System32)
+	# GPU acceleration through WSL's d3d12 driver
+	export LIBVA_DRIVER_NAME=d3d12
+	export GALLIUM_DRIVER=d3d12
+	export LD_LIBRARY_PATH=/usr/lib/wsl/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
+fi
+
+export LANG=en_US.UTF-8
+export LC_TIME=da_DK.UTF-8
+export EDITOR=vim
+export PAGER=less
+export LESS='-InSR'   # case-insensitive search, no line counting, raw colors
+export npm_config_prefix=$HOME/.local
+export OOO_FORCE_DESKTOP=kde
+
+# Colors in less (man pages)
+export LESS_TERMCAP_mb=$'\e[01;31m'
+export LESS_TERMCAP_md=$'\e[01;31m'
+export LESS_TERMCAP_me=$'\e[0m'
+export LESS_TERMCAP_se=$'\e[0m'
+export LESS_TERMCAP_so=$'\e[01;44;33m'
+export LESS_TERMCAP_ue=$'\e[0m'
+export LESS_TERMCAP_us=$'\e[01;32m'
+
+if (( $+commands[dircolors] )); then
+	if [[ -r ~/.dir_colors ]]; then
+		eval "$(dircolors -b ~/.dir_colors)"
+	else
+		eval "$(dircolors -b)"
+	fi
+fi
+
+READNULLCMD=$PAGER
+
+###
+### SHELL OPTIONS
+###
+
+autoload -Uz compinit && compinit
+
+HISTSIZE=100000
+SAVEHIST=$HISTSIZE
+HISTFILE=~/.zsh_history
+setopt extended_history
+setopt hist_find_no_dups
+setopt hist_ignore_space
+setopt hist_ignore_all_dups
+setopt share_history
+
+DIRSTACKSIZE=10
+setopt autocd
+setopt autopushd
+setopt brace_ccl     # expand {a-z} character classes
+setopt chase_links   # resolve symlinks in $PWD
+
+# Fallback prompt; Powerlevel10k replaces it in full mode
+if (( EUID == 0 )); then
+	PS1='%B%F{red}%M %F{blue}%c %%%f%b '
+else
+	PS1='%B%F{green}%n@%M %F{yellow}%c %%%f%b '
+fi
+
+# Terminal title (and tmux window name): current dir [user@host]
+autoload -Uz add-zsh-hook
+_set_title() {
+	local dir=${(%):-%~}
+	(( ${#dir} > 18 )) && dir=..${dir[-15,-1]}
+	printf '\e]0;%s [%s@%s]\a' "$dir" "${(%):-%n}" "${(%):-%M}"
+	[[ -n $TMUX ]] && printf '\ek%s %s@%s\e\\' "$dir" "${(%):-%n}" "${(%):-%M}"
+}
+add-zsh-hook precmd _set_title
+
+###
+### KEY BINDINGS
+###
+
+bindkey -e
+
+bindkey '\e[1~' beginning-of-line   # Home
+bindkey '\e[7~' beginning-of-line   # Home (rxvt)
+bindkey '\eOH'  beginning-of-line   # Home (xterm)
+bindkey '\e[H'  beginning-of-line   # Home (console)
+bindkey '\e[4~' end-of-line         # End
+bindkey '\e[8~' end-of-line         # End (rxvt)
+bindkey '\eOF'  end-of-line         # End (xterm)
+bindkey '\e[F'  end-of-line         # End (console)
+bindkey '\e[5~' beginning-of-history  # PageUp
+bindkey '\e[6~' end-of-history        # PageDown
+bindkey '\e[2~' quoted-insert         # Ins
+bindkey '\e[3~' delete-char           # Del
+bindkey '\e[Z'  reverse-menu-complete # Shift+Tab
+
+# Ctrl/Alt + Left/Right
+bindkey '\e[1;5C' forward-word
+bindkey '\e[1;5D' backward-word
+bindkey '\e[5C'   forward-word
+bindkey '\e[5D'   backward-word
+bindkey '\eOc'    emacs-forward-word
+bindkey '\eOd'    emacs-backward-word
+bindkey '\e\e[C'  forward-word
+bindkey '\e\e[D'  backward-word
+
+# Ctrl+Delete / Ctrl+Backspace
+_backward_kill_default_word() {
+	WORDCHARS='*?_.[]~=&;#$%^(){}<>' zle backward-kill-word
+}
+zle -N backward-kill-default-word _backward_kill_default_word
+bindkey '\e[3;5~' kill-word
+bindkey '^H'      backward-kill-default-word
+
+# Up/Down search history for what's already typed
+bindkey '\e[A' up-line-or-search
+bindkey '\e[B' down-line-or-search
+
+###
+### ALIASES
+###
+
+alias ls='ls --quoting-style=literal -h --color'
+alias ll='ls -lh'
+alias la='ls -lAh'
+alias f='ll | grep -i'
+alias grep='grep --color=auto'
+alias -g gr='| grep -i'
+alias dirs='dirs -lv'
+alias du='du -h'
+alias df='df -h'
+alias slocate='slocate -i'
+alias locate='locate -i'
+alias ...='cd ../../'
+alias makepkg='nice -n 19 makepkg'
+alias nano='nano -xwc'
+alias screen='screen -U'
+alias poweroff='systemctl poweroff'
+alias shutdown='systemctl poweroff'
+alias reboot='systemctl reboot'
+alias umount='sudo umount'
+alias jobs='jobs -l'
+alias insecuressh='ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
+alias insecurescp='scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
+alias gits='git status'
+alias gita='git add'
+alias gitc='git commit'
+alias gitd='git diff'
+alias gitp='git push'
+alias x509='openssl x509 -noout -text -in'
+alias ranger='y'
+
+alias -s log=less
+
+###
+### FUNCTIONS
+###
+
+# Open files/URLs in the background, detached from the shell
+open() {
+	xdg-open "$@" &>/dev/null &!
+}
+
+# Use trizen (AUR) for normal users, plain pacman for root
+pacman() {
+	if (( EUID == 0 )) || ! (( $+commands[trizen] )); then
+		command pacman "$@"
+	else
+		trizen "$@"
+	fi
+}
+
+# Search repos and AUR
+pacs() {
+	trizen -Ssa --color=always "$1"
+	trizen -Ssr --color=always "$1"
+}
+
+# extract archive... [destdir]
+extract() {
+	local dir=. archive
+	if (( $# > 1 )) && [[ -d ${@[-1]} || ! -f ${@[-1]} ]]; then
+		dir=${@[-1]}
+		mkdir -p -- "$dir"
+	fi
+	for archive in "$@"; do
+		[[ $archive == "$dir" ]] && continue
+		if [[ ! -f $archive ]]; then
+			echo "'$archive' is not a valid archive file!"
+			continue
+		fi
+		case $archive in
+			*.tar.bz2|*.tbz2) tar -C "$dir" -xvjf "$archive" ;;
+			*.tar.gz|*.tgz)   tar -C "$dir" -xvzf "$archive" ;;
+			*.tar.xz|*.txz)   tar -C "$dir" -xvJf "$archive" ;;
+			*.bz2)            bunzip2 -c "$archive" > "$dir/${archive:t:r}" ;;
+			*.gz)             gunzip -c "$archive" > "$dir/${archive:t:r}" ;;
+			*.tar)            tar -C "$dir" -xvf "$archive" ;;
+			*.zip|*.jar)      unzip -d "$dir" "$archive" ;;
+			*.rar)            unrar x "$archive" "$dir" ;;
+			*.Z)              uncompress -c "$archive" > "$dir/${archive:t:r}" ;;
+			*.7z)             7z x -o"$dir" "$archive" ;;
+			*)
+				echo "Unknown file extension, detecting mime type..."
+				case $(file -b --mime-type "$archive") in
+					application/x-bzip2)         tar -C "$dir" -xvjf "$archive" ;;
+					application/x-gzip|application/gzip) tar -C "$dir" -xvzf "$archive" ;;
+					application/x-xz)            tar -C "$dir" -xvJf "$archive" ;;
+					application/zip|application/java-archive) unzip -d "$dir" "$archive" ;;
+					application/x-rar)           unrar x "$archive" "$dir" ;;
+					application/x-7z-compressed) 7z x -o"$dir" "$archive" ;;
+					*) echo "don't know how to extract '$archive'" ;;
+				esac
+				;;
+		esac
+	done
+}
+
+# pack archive_file file [dir|file]...
+pack() {
+	if (( $# < 2 )); then
+		echo "Usage: pack archive_file file [dir|file]..."
+		return 1
+	fi
+	[[ -e $1 ]] && { echo "error: destination $1 exists"; return 1 }
+
+	case ${(L)1} in
+		*.tar.bz2|*.tbz2) tar --dereference -cvjf "$@" ;;
+		*.tar.gz|*.tgz)   tar --dereference -cvzf "$@" ;;
+		*.tar.xz)         tar --dereference -cvJf "$@" ;;
+		*.tar.lzma)       tar --dereference --lzma -cvf "$@" ;;
+		*.tar)            tar --dereference -cvf "$@" ;;
+		*.bz2)            7za a -tbzip2 "$@" ;;
+		*.gz)             7za a -tgzip "$@" ;;
+		*.rar)            rar a -r "$@" ;;
+		*.zip)            zip -r "$@" ;;
+		*.7z)             7za a -t7z -mmt "$@" ;;
+		*) echo "I don't know what to do with '$1'" ;;
+	esac
+}
+
+# Reload zsh config
+reload() {
+	exec zsh
+}
+
+# Pull dotfiles, reinstall the shared config and reload
+update_conf() {
+	local repo=${DOTFILES:-$HOME/dotfiles}
+	git -C "$repo" pull && sudo "$repo/zsh/install.sh" && exec zsh
+}
+
+whois() {
+	command whois -H "$@" | iconv -f iso-8859-1 -t utf-8
+}
+
+# Show .nfo files with their original cp437 charset
+less() {
+	case $1 in
+		*.nfo|*.NFO)
+			local f
+			for f in "$@"; do
+				iconv -f cp437 -t utf-8 < "$f" | command less
+			done
+			;;
+		*)
+			command less "$@"
+			;;
+	esac
+}
+
+diff() {
+	if (( $+commands[colordiff] )); then
+		colordiff "$@"
+	else
+		command diff "$@"
+	fi
+}
+
+prettify-json() {
+	local tmp
+	tmp=$(mktemp) && jq . < "$1" > "$tmp" && mv -- "$tmp" "$1"
+}
+
+minify-json() {
+	local tmp
+	tmp=$(mktemp) && jq -c . < "$1" > "$tmp" && mv -- "$tmp" "$1"
+}
+
+# mssh host1 host2 ...: one tiled tmux window with an ssh pane per host
+mssh() {
+	if [[ -z $1 ]]; then
+		echo "Usage: mssh host1 host2 host{01..03}.example.com"
+		return 1
+	fi
+	local host first=$1
+	shift
+	tmux new-window -n "mssh: ${first%%.*}" "ssh $first"
+	for host in "$@"; do
+		tmux split-window -h "ssh $host"
+		tmux select-layout tiled
+	done
+	# tmux set-window-option synchronize-panes on
+	tmux select-pane -t 0
+}
+
+# yazi; cd to its last directory on exit
+y() {
+	local tmp cwd
+	tmp=$(mktemp -t yazi-cwd.XXXXXX)
+	command yazi "$@" --cwd-file="$tmp"
+	IFS= read -r -d '' cwd < "$tmp"
+	[[ -n $cwd && $cwd != "$PWD" && -d $cwd ]] && builtin cd -- "$cwd"
+	rm -f -- "$tmp"
+}
+
+###
+### PLUGINS
+###
+
+if (( ! ZSH_LIGHT )); then
+	_zsrc /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+	_zsrc /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
+	# Run `p10k configure` to make a personal ~/.p10k.zsh
+	if [[ -r ~/.p10k.zsh ]]; then
+		source ~/.p10k.zsh
+	else
+		_zsrc /etc/zsh/p10k.zsh
+	fi
+fi
+
+(( $+commands[fzf] )) && source <(fzf --zsh)
+
+# Must be loaded last
+_zsrc /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+unfunction _zsrc

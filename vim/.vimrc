@@ -32,13 +32,9 @@ endif
 call plug#begin(configpath . '/plugged')
 Plug 'itchyny/lightline.vim'
 Plug 'vim-perl/vim-perl', { 'for': 'perl', 'do': 'make clean carp dancer highlight-all-pragmas moose test-more try-tiny' }
-Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
-Plug 'altercation/vim-colors-solarized'
 Plug 'vim-scripts/mojo.vim'
-Plug 'chase/vim-ansible-yaml'
-" Plugin 'scrooloose/nerdtree.git'
-" Plugin 'jiangmiao/auto-pairs'
+Plug 'pearofducks/ansible-vim'
 call plug#end()
 
 " Linenumber colors
@@ -56,13 +52,6 @@ let mapleader=" "
 
 " Plugin options
 """"""""""""""""
-
-" Only start emmet in html or css
-let g:user_emmet_leader_key='<C-X>'
-let g:user_emmet_install_global = 0
-if exists(":EmmetInstall")
-  autocmd FileType html,css EmmetInstall
-endif
 
 " Mojo highlighting
 let g:mojo_highlight_data = 1
@@ -84,13 +73,6 @@ nnoremap <leader>y "+y
 nnoremap <leader>p "+p
 nnoremap <leader>P "+P
 
-" Set closetag filenamghes
-let g:closetag_filenames = '*.html,*.xhtml,*.phtml,*.ep'
-let g:closetag_xhtml_filenames = '*.xhtml,*.jsx,*.ep'
-
-" Force > by tapping <leader> first
-let g:closetag_close_shortcut = '<leader>>'
-
 " Basic settings
 set number
 syntax on
@@ -104,6 +86,7 @@ set laststatus=2
 set nobackup
 set nowritebackup
 set scrolloff=8
+set relativenumber
 
 " Filetype detection
 augroup twig_ft
@@ -113,6 +96,9 @@ augroup twig_ft
 augroup END
 
 " Don't litter swp files everywhere
+if !isdirectory($HOME . '/.vim/tmp')
+  call mkdir($HOME . '/.vim/tmp', 'p', 0700)
+endif
 set directory^=$HOME/.vim/tmp//
 " Search
 set incsearch
@@ -127,17 +113,17 @@ runtime! macros/matchit.vim
 " Visualize tabs and newlines
 set listchars=tab:▶\ ,eol:¬,extends:…,precedes:…
 set nolist
-map <leader>l :set list!<CR> " Toggle
+" Toggle
+map <leader>l :set list!<CR>
 highlight NonText ctermfg=8
 highlight SpecialKey ctermfg=8
 
 " allow backspacing over everything in insert mode
 set backspace=indent,eol,start
 
-set history=50    " keep 50 lines of command line history
-set ruler   " show the cursor position all the time
-set showcmd   " display incomplete commands
-set incsearch   " do incremental searching
+set history=1000  " lines of command line history
+set ruler         " show the cursor position all the time
+set showcmd       " display incomplete commands
 
 " Don't use Ex mode, use Q for formatting
 map Q gq
@@ -183,22 +169,12 @@ nnoremap <C-J> <C-W><C-J>
 nnoremap <C-K> <C-W><C-K>
 nnoremap <C-L> <C-W><C-L>
 nnoremap <C-H> <C-W><C-H>
-nnoremap <F1> :NERDTreeToggle<CR>
 set splitbelow
 set splitright
 
 " Tab indents in Visual Mode
 vmap <tab> >gv
 vmap <s-tab> <gv
-
-" Auto-close pairs
-"inoremap " ""<left>
-"inoremap ' ''<left>
-"inoremap ( ()<left>
-"inoremap [ []<left>
-"inoremap { {}<left>
-"inoremap {<CR> {<CR>}<ESC>O
-"inoremap {;<CR> {<CR>};<ESC>O
 
 " Colors
 set t_Co=256
@@ -210,7 +186,7 @@ autocmd FileType javascript setlocal ts=2 sts=2 sw=2 expandtab
 autocmd FileType vue setlocal ts=2 sts=2 sw=2 expandtab
 
 " Vimdiff quickfix
-highlight DiffAdd  cterm=bold ctermfg=10 ctermbg=17 gui=none guifg=bg guibg=Red
-highlight DiffDelete cterm=bold ctermfg=10 ctermbg=17 gui=none guifg=bg guibg=Red
-highlight DiffChange cterm=bold ctermfg=10 ctermbg=17 gui=none guifg=bg guibg=Red
-highlight DiffText   cterm=bold ctermfg=10 ctermbg=88 gui=none guifg=bg guibg=Red
+highlight DiffAdd    cterm=none ctermfg=none ctermbg=22 gui=none guibg=#1e3a1e
+highlight DiffDelete cterm=none ctermfg=88   ctermbg=52 gui=none guibg=#3a1e1e
+highlight DiffChange cterm=none ctermfg=none ctermbg=17 gui=none guibg=#1e1e3a
+highlight DiffText   cterm=bold ctermfg=none ctermbg=25 gui=bold guibg=#2a4a7a
