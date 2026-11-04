@@ -69,7 +69,7 @@ if [[ -r /proc/version && $(</proc/version) == *[Mm]icrosoft* ]]; then
 fi
 
 export LANG=en_US.UTF-8
-export LC_TIME=da_DK.UTF-8
+export LC_TIME=en_DK.UTF-8
 export EDITOR=vim
 export PAGER=less
 export LESS='-InSR'   # case-insensitive search, no line counting, raw colors

@@ -44,6 +44,13 @@ for user in "$@"; do
 		chmod 600 "$rc.bak-$ts" 2>/dev/null || true
 		echo "$rc: moved old file to $rc.bak-$ts (copy anything private from it)"
 	fi
-	install -o "$user" -g "$group" -m 600 "$src/zshrc.local.example" "$rc"
+	install -o "$user" -g "$group" -m 600 /dev/stdin "$rc" <<'STUB'
+# zshrc.local: private settings for this user.
+# Loaded after the shared /etc/zsh/zshrc. Not tracked in git.
+#
+# To start tmux automatically on login, put this in ~/.zshenv instead
+# (it has to be set before the shared config runs):
+#   ZSH_TMUX_AUTOSTART=1
+STUB
 	echo "$rc: created local stub"
 done
